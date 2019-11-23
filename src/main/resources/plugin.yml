@@ -1,0 +1,10 @@
+name: RideOperator
+main: dev.niekv.ride.RideOperatorMenuPlugin
+version: ${project.version}
+author: ApocalypsjeNL
+
+api-version: "1.14"
+
+commands:
+  rideoperator:
+    description: "Main command for the RideOperator plugin"
