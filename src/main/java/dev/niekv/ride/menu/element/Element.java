@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Element {
+public abstract class Element {
 
     private static final AtomicInteger timerTaskId = new AtomicInteger();
-    final Timer timer = new Timer("RideControl Element Timer #" + Element.timerTaskId.getAndIncrement());
+    final Timer timer = new Timer("RideOperatorMenu Element Timer #" + Element.timerTaskId.getAndIncrement());
 
     Menu menu;
     BukkitItem item;
@@ -22,7 +22,7 @@ public class Element {
     private String displayName;
     private final List<String> lore = new ArrayList<>();
 
-    public Element(Menu menu, String elementId, BukkitItem item) {
+    Element(Menu menu, String elementId, BukkitItem item) {
         this.menu = menu;
         this.elementId = elementId;
         this.item = item;
@@ -66,6 +66,7 @@ public class Element {
         return this.item.getItemStack(this.displayName, this.lore);
     }
 
-    public void handleClick() {
-    }
+    public abstract void handleClick();
+
+    public abstract boolean isClear();
 }

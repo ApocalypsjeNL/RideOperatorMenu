@@ -3,27 +3,28 @@ package dev.niekv.ride.menu.element;
 import dev.niekv.ride.menu.Menu;
 import dev.niekv.ride.menu.util.BukkitItem;
 
-import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public class Button extends Element {
 
-    private Consumer<Void> onClickHandler;
+    private Consumer<ButtonState> onClickHandler;
+    private BukkitItem originalItem;
     private BukkitItem pressedItem;
-    private int pressedItemDelay;
 
-    private boolean beingPressed = false;
+    private ButtonState state;
 
     public Button(Menu menu, String elementId, BukkitItem item) {
         super(menu, elementId, item);
+        this.originalItem = item;
     }
 
-    public Button(Menu menu, String elementId, BukkitItem item, Consumer<Void> onClickHandler) {
+    public Button(Menu menu, String elementId, BukkitItem item, Consumer<ButtonState> onClickHandler) {
         super(menu, elementId, item);
+        this.originalItem = item;
         this.onClickHandler = onClickHandler;
     }
 
-    public void setOnClickHandler(Consumer<Void> onClickHandler) {
+    public void setOnClickHandler(Consumer<ButtonState> onClickHandler) {
         this.onClickHandler = onClickHandler;
     }
 
@@ -31,32 +32,37 @@ public class Button extends Element {
         return this.pressedItem;
     }
 
-    public Button setPressedItem(BukkitItem pressedItem, int delay) {
+    public Button setPressedItem(BukkitItem pressedItem) {
         this.pressedItem = pressedItem;
-        this.pressedItemDelay = delay;
         return this;
     }
 
+    @Override
     public void handleClick() {
-        if (this.pressedItem != null && !this.beingPressed) {
-            this.beingPressed = true;
-            final BukkitItem currentItem = this.item;
+        if (this.pressedItem != null && this.state.equals(ButtonState.RELEASED)) {
+            this.state = ButtonState.PRESSED;
+            this.onClickHandler.accept(this.state);
 
             this.item = this.pressedItem;
             this.menu.update(this);
-
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Button.this.item = currentItem;
-                    Button.this.beingPressed = false;
-                    Button.this.menu.update(Button.this);
-                }
-            }, this.pressedItemDelay);
         }
 
-        if (this.pressedItem == null || !this.beingPressed) {
-            this.onClickHandler.accept(null);
+        if(this.state.equals(ButtonState.PRESSED)) {
+            this.state = ButtonState.RELEASED;
+            this.onClickHandler.accept(this.state);
+
+            this.item = this.originalItem;
+            this.menu.update(this);
         }
+    }
+
+    @Override
+    public boolean isClear() {
+        return this.state.equals(ButtonState.RELEASED);
+    }
+
+    public enum ButtonState {
+        RELEASED,
+        PRESSED
     }
 }

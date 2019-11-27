@@ -29,15 +29,6 @@ public class Switch extends Element {
         this.menu.update(this);
     }
 
-    public enum SwitchState {
-        LEFT,
-        RIGHT;
-
-        SwitchState invert() {
-            return this.equals(SwitchState.LEFT) ? SwitchState.RIGHT : SwitchState.LEFT;
-        }
-    }
-
     public void setOnClickHandler(Consumer<SwitchState> onClickHandler) {
         this.onClickHandler = onClickHandler;
     }
@@ -51,6 +42,7 @@ public class Switch extends Element {
         return this;
     }
 
+    @Override
     public void handleClick() {
         this.switchState = this.switchState.invert();
 
@@ -64,6 +56,20 @@ public class Switch extends Element {
             }
 
             this.menu.update(this);
+        }
+    }
+
+    @Override
+    public boolean isClear() {
+        return this.switchState.equals(SwitchState.LEFT);
+    }
+
+    public enum SwitchState {
+        LEFT,
+        RIGHT;
+
+        SwitchState invert() {
+            return this.equals(SwitchState.LEFT) ? SwitchState.RIGHT : SwitchState.LEFT;
         }
     }
 }
